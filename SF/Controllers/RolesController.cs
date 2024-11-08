@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SF.Models;
 
 namespace SF.Controllers
 {
-    [Authorize(Roles = "SuperAdmin")]
+    //[Authorize(Roles = "SuperAdmin")]
     public class RolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -58,6 +59,8 @@ namespace SF.Controllers
             return View(role);
         }
 
+
+
         // GET: Roles/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
@@ -86,6 +89,59 @@ namespace SF.Controllers
                 }
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Roles/Edit/5
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (id == null) return NotFound();
+
+            var role = await _roleManager.FindByIdAsync(id);
+            if (role == null) return NotFound();
+
+            return View(role);
+        }
+
+        // POST: Roles/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name")] IdentityRole role)
+        {
+            if (id != role.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingRole = await _roleManager.FindByIdAsync(id);
+                    if (existingRole == null) return NotFound();
+
+                    existingRole.Name = role.Name;
+                    var result = await _roleManager.UpdateAsync(existingRole);
+
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _roleManager.RoleExistsAsync(role.Name))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            return View(role);
         }
 
         // GET: Roles/UsersInRole/roleName

@@ -1,67 +1,51 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@model Company
+@model SF.ViewModel.CompanyDetailsViewModel
 @inject UserManager<ApplicationUser> UserManager;
 
 @{
     ViewData["Title"] = "Company Details";
 }
 
-<h1>Company Details</h1>
-
 <div>
+    <h1>Company Details</h1>
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
+        <dt class="col-sm-2">Name</dt>
+        <dd class="col-sm-10">@Model.Company.Name</dd>
+        <dt class="col-sm-2">Address</dt>
+        <dd class="col-sm-10">@Model.Company.Address</dd>
+        <dt class="col-sm-2">Phone</dt>
+        <dd class="col-sm-10">@Model.Company.Phone</dd>
     </dl>
 
     <h4>Users in this Company</h4>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model.Users)
-            {
+    @if (Model.UserRoles.Any())
+    {
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@user.FirstName @user.LastName</td>
-                    <td>@user.Email</td>
-                    <td>@(await UserManager.GetRolesAsync(user)).FirstOrDefault()</td>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Company.Users)
+                {
+                    <tr>
+                        <td>@user.FirstName @user.LastName</td>
+                        <td>@user.Email</td>
+                        <td>@Model.UserRoles[user.Id]</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No users assigned to this company.</p>
+    }
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Edit" asp-route-id="@Model.Company.Id" class="btn btn-primary">Edit</a>
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
-
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

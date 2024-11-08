@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SF.Data;
 using SF.Models;
+using SF.ViewModel;
 
 namespace SF.Controllers
 {
@@ -39,13 +40,33 @@ namespace SF.Controllers
             }
 
             var company = await _context.Companies
+                .Include(c => c.Users) // Includes Users, if any
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (company == null)
             {
                 return NotFound();
             }
 
-            return View(company);
+            var userRoles = new Dictionary<string, string>();
+
+            if (company.Users != null)
+            {
+                foreach (var user in company.Users)
+                {
+                    var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                    userRoles[user.Id] = role ?? "No Role Assigned"; // Handle case where role is null
+                }
+            }
+
+            // Pass company and user roles to the view
+            var viewModel = new CompanyDetailsViewModel
+            {
+                Company = company,
+                UserRoles = userRoles
+            };
+
+            return View(viewModel);
         }
 
         // GET: Companies/Create
