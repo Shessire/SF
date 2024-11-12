@@ -9,5 +9,7 @@ namespace SF.Models
         public string LastName { get; set; }
         public int CompanyId { get; set; }
         public Company Company { get; set; }
+        public string TelephoneNumber { get; set; }
+        public string FaxNumber { get; set; }
     }
 }
