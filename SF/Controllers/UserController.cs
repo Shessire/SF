@@ -118,36 +118,34 @@ namespace SF.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // If validation fails, reload the dropdowns and return the view
+                // Reload dropdowns if validation fails
                 ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
                 ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
                 return View(model);
             }
 
-            // Find the user by ID
             var user = await _userManager.FindByIdAsync(model.Id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Update user fields
+            // Update user properties
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.CompanyId = model.CompanyId;
             user.TelephoneNumber = model.TelephoneNumber;
             user.FaxNumber = model.FaxNumber;
 
-            // Update the role if it's changed
+            // Check and update role
             var currentRoles = await _userManager.GetRolesAsync(user);
             if (model.RoleName != currentRoles.FirstOrDefault())
             {
-                // Remove from current roles and add to the new role
                 await _userManager.RemoveFromRolesAsync(user, currentRoles);
                 await _userManager.AddToRoleAsync(user, model.RoleName);
             }
 
-            // Update password if a new password is provided
+            // Update password if provided
             if (!string.IsNullOrWhiteSpace(model.Password))
             {
                 var passwordResult = await _userManager.RemovePasswordAsync(user);
@@ -160,7 +158,6 @@ namespace SF.Controllers
                         {
                             ModelState.AddModelError("", error.Description);
                         }
-                        // Reload dropdowns if there's a password error
                         ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
                         ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
                         return View(model);
@@ -168,24 +165,24 @@ namespace SF.Controllers
                 }
             }
 
-            // Save the changes
             var updateResult = await _userManager.UpdateAsync(user);
             if (updateResult.Succeeded)
             {
                 return RedirectToAction(nameof(Index));
             }
 
-            // If update failed, add errors to ModelState
+            // Handle update errors
             foreach (var error in updateResult.Errors)
             {
                 ModelState.AddModelError("", error.Description);
             }
 
-            // Reload dropdowns in case of failure and return the view
+            // Reload dropdowns if there's an error
             ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
             ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
             return View(model);
         }
+
 
         public async Task<IActionResult> Delete(string id)
         {

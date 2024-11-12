@@ -4,23 +4,39 @@
 <h2>Edit User</h2>
 
 <form asp-action="Edit" method="post">
-    @Html.AntiForgeryToken() <!-- Adds anti-forgery token for security -->
+    @Html.AntiForgeryToken()
 
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <!-- Hidden field for Id if you need it -->
     <input asp-for="Id" type="hidden" />
 
-    <div class="form-group">
-        <label asp-for="FirstName"></label>
-        <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label asp-for="LastName"></label>
-        <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger"></span>
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <small class="form-text text-danger">*Leave blank to keep the current password.</small>
+            </div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -29,17 +45,22 @@
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-        <small class="form-text text-muted">Leave blank to keep the current password.</small>
-    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="CompanyId"></label>
+                <select asp-for="CompanyId" class="form-control" asp-items="@(ViewData["Companies"] as SelectList)"></select>
+                <span asp-validation-for="CompanyId" class="text-danger"></span>
+            </div>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="CompanyId"></label>
-        <select asp-for="CompanyId" class="form-control" asp-items="@(ViewData["Companies"] as SelectList)"></select>
-        <span asp-validation-for="CompanyId" class="text-danger"></span>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="RoleName"></label>
+                <select asp-for="RoleName" class="form-control" asp-items="@(ViewData["Roles"] as SelectList)"></select>
+                <span asp-validation-for="RoleName" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -54,19 +75,11 @@
         <span asp-validation-for="FaxNumber" class="text-danger"></span>
     </div>
 
-
-    <div class="form-group">
-        <label asp-for="RoleName"></label>
-        <select asp-for="RoleName" class="form-control" asp-items="@(ViewData["Roles"] as SelectList)"></select>
-        <span asp-validation-for="RoleName" class="text-danger"></span>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a asp-action="Index" class="btn btn-secondary w-25">Back</a>
+        <button type="submit" class="btn btn-primary w-25">Save Changes</button>
     </div>
-
-    <button type="submit" class="btn btn-primary">Save Changes</button>
 </form>
-
-<div>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</div>
 
 @section Scripts {
     @{

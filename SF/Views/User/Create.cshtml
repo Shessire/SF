@@ -6,16 +6,40 @@
 <form asp-action="Create" method="post">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="form-group">
-        <label asp-for="FirstName"></label>
-        <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label asp-for="LastName"></label>
-        <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="ConfirmPassword"></label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -24,16 +48,22 @@
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="CompanyId"></label>
+                <select asp-for="CompanyId" class="form-control" asp-items="@(ViewData["Companies"] as SelectList)"></select>
+                <span asp-validation-for="CompanyId" class="text-danger"></span>
+            </div>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="CompanyId"></label>
-        <select asp-for="CompanyId" class="form-control" asp-items="@(ViewData["Companies"] as SelectList)"></select>
-        <span asp-validation-for="CompanyId" class="text-danger"></span>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="RoleName"></label>
+                <select asp-for="RoleName" class="form-control" asp-items="@(ViewData["Roles"] as SelectList)"></select>
+                <span asp-validation-for="RoleName" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -41,26 +71,18 @@
         <input asp-for="TelephoneNumber" class="form-control" />
         <span asp-validation-for="TelephoneNumber" class="text-danger"></span>
     </div>
-
+    
     <div class="form-group">
         <label asp-for="FaxNumber"></label>
         <input asp-for="FaxNumber" class="form-control" />
         <span asp-validation-for="FaxNumber" class="text-danger"></span>
     </div>
 
-
-    <div class="form-group">
-        <label asp-for="RoleName"></label>
-        <select asp-for="RoleName" class="form-control" asp-items="@(ViewData["Roles"] as SelectList)"></select>
-        <span asp-validation-for="RoleName" class="text-danger"></span>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a type="button" asp-action="Index" class="btn btn-secondary w-25">Back</a>
+        <button type="submit" class="btn btn-primary w-25">Create User</button>
     </div>
-
-    <button type="submit" class="btn btn-primary">Create User</button>
 </form>
-
-<div>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</div>
 
 @section Scripts {
     @{
