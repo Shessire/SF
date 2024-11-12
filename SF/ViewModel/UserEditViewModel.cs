@@ -29,5 +29,9 @@ namespace SF.ViewModel
         [Required]
         [Display(Name = "Role")]
         public string RoleName { get; set; }
+
+        public string TelephoneNumber { get; set; }
+
+        public string FaxNumber { get; set; }
     }
 }

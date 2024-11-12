@@ -52,8 +52,10 @@ namespace SF.Controllers
                     Email = model.Email,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    CompanyId = model.CompanyId
-                };
+                    CompanyId = model.CompanyId,
+                    TelephoneNumber = model.TelephoneNumber,
+                    FaxNumber = model.FaxNumber
+            };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -90,14 +92,16 @@ namespace SF.Controllers
                 return NotFound();
             }
 
-            // Map user data to the UserCreateViewModel
+            // Map user data to the UserEditViewModel
             var model = new UserEditViewModel
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                CompanyId = user.CompanyId, // Assuming CompanyId is a property on your ApplicationUser
+                CompanyId = user.CompanyId,
+                TelephoneNumber = user.TelephoneNumber,
+                FaxNumber = user.FaxNumber,
                 RoleName = (await _userManager.GetRolesAsync(user)).FirstOrDefault() // Get current role
             };
 
@@ -130,7 +134,9 @@ namespace SF.Controllers
             // Update user fields
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
-            user.CompanyId = model.CompanyId; // Update the user's company
+            user.CompanyId = model.CompanyId;
+            user.TelephoneNumber = model.TelephoneNumber;
+            user.FaxNumber = model.FaxNumber;
 
             // Update the role if it's changed
             var currentRoles = await _userManager.GetRolesAsync(user);

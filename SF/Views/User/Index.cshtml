@@ -23,6 +23,8 @@
                         <th>Full Name</th>
                         <th>Email</th>
                         <th>Company</th>
+                        <th>Telephone Number</th>
+                        <th>Fax Number</th>
                         <th>Roles</th>
                         <th>Actions</th>
                     </tr>
@@ -34,6 +36,8 @@
                             <td>@user.FirstName @user.LastName</td>
                             <td>@user.Email</td>
                             <td>@user.Company?.Name</td>
+                            <td>@user.TelephoneNumber</td>
+                            <td>@user.FaxNumber</td>
                             <td>@string.Join(", ", await UserManager.GetRolesAsync(user))</td>
                             <td>
                                 <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-warning">Edit</a>

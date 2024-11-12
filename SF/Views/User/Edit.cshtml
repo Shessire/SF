@@ -43,6 +43,19 @@
     </div>
 
     <div class="form-group">
+        <label asp-for="TelephoneNumber"></label>
+        <input asp-for="TelephoneNumber" class="form-control" />
+        <span asp-validation-for="TelephoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FaxNumber"></label>
+        <input asp-for="FaxNumber" class="form-control" />
+        <span asp-validation-for="FaxNumber" class="text-danger"></span>
+    </div>
+
+
+    <div class="form-group">
         <label asp-for="RoleName"></label>
         <select asp-for="RoleName" class="form-control" asp-items="@(ViewData["Roles"] as SelectList)"></select>
         <span asp-validation-for="RoleName" class="text-danger"></span>
