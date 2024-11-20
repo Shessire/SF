@@ -19,10 +19,6 @@ namespace SF.ViewModel
         [EmailAddress]
         public string Email { get; set; }
 
-        [DataType(DataType.Password)]
-        [Display(Prompt = "Leave blank to keep current password")]
-        public string Password { get; set; }
-
         [Required]
         [Display(Name = "Company")]
         public int CompanyId { get; set; }

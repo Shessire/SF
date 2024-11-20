@@ -145,26 +145,6 @@ namespace SF.Controllers
                 await _userManager.AddToRoleAsync(user, model.RoleName);
             }
 
-            // Update password if provided
-            if (!string.IsNullOrWhiteSpace(model.Password))
-            {
-                var passwordResult = await _userManager.RemovePasswordAsync(user);
-                if (passwordResult.Succeeded)
-                {
-                    var addPasswordResult = await _userManager.AddPasswordAsync(user, model.Password);
-                    if (!addPasswordResult.Succeeded)
-                    {
-                        foreach (var error in addPasswordResult.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
-                        ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
-                        ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
-                        return View(model);
-                    }
-                }
-            }
-
             var updateResult = await _userManager.UpdateAsync(user);
             if (updateResult.Succeeded)
             {
@@ -217,6 +197,98 @@ namespace SF.Controllers
 
             return View(user);
         }
+
+        // GET: User/ResetPassword/5
+        [Authorize(Roles = "Admin, SuperAdmin")]
+        public IActionResult ResetPassword(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ResetPasswordViewModel { UserId = id };
+            return View(model);
+        }
+
+        // POST: User/ResetPassword/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin, SuperAdmin")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var removePasswordResult = await _userManager.RemovePasswordAsync(user);
+            if (!removePasswordResult.Succeeded)
+            {
+                foreach (var error in removePasswordResult.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(model);
+            }
+
+            var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
+            if (addPasswordResult.Succeeded)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            foreach (var error in addPasswordResult.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View(model);
+        }
+
+        // GET: User/ChangePassword
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        // POST: User/ChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessage"] = "Password changed successfully.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
+
 
     }
 }

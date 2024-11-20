@@ -6,6 +6,7 @@ namespace SF.Data
     public class DbInitializer
     {
         private readonly ApplicationDbContext _context;
+        
 
         public DbInitializer(ApplicationDbContext context)
         {
