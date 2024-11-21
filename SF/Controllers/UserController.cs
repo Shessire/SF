@@ -34,47 +34,77 @@ namespace SF.Controllers
 
         public async Task<IActionResult> Create()
         {
-            ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
-            ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+            var model = new UserCreateViewModel
+            {
+                Roles = await _roleManager.Roles
+            .Select(r => new RoleViewModel
+            {
+                RoleName = r.Name,
+                IsSelected = false
+            })
+            .ToListAsync()
+            };
 
-            return View();
+            ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserCreateViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = new ApplicationUser
-                {
-                    UserName = model.Email,
-                    Email = model.Email,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    CompanyId = model.CompanyId,
-                    TelephoneNumber = model.TelephoneNumber,
-                    FaxNumber = model.FaxNumber
+                model.Roles = await _roleManager.Roles
+                    .Select(r => new RoleViewModel
+                    {
+                        RoleName = r.Name,
+                        IsSelected = false
+                    })
+                    .ToListAsync();
+
+                ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+                return View(model);
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                CompanyId = model.CompanyId,
+                TelephoneNumber = model.TelephoneNumber,
+                FaxNumber = model.FaxNumber
             };
 
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, model.RoleName);
-                    return RedirectToAction(nameof(Index));
-                }
-
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
                 }
+
+                model.Roles = await _roleManager.Roles
+                    .Select(r => new RoleViewModel
+                    {
+                        RoleName = r.Name,
+                        IsSelected = false
+                    })
+                    .ToListAsync();
+
+                ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+                return View(model);
             }
 
-            // Re-populate the role and company lists if model validation fails
-            ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
-            ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+            // Assign roles
+            foreach (var roleName in model.SelectedRoles)
+            {
+                await _userManager.AddToRoleAsync(user, roleName);
+            }
 
-            return View(model);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: User/Edit/5
@@ -85,14 +115,14 @@ namespace SF.Controllers
                 return NotFound();
             }
 
-            // Find the user by ID
             var user = await _userManager.FindByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Map user data to the UserEditViewModel
+            var userRoles = await _userManager.GetRolesAsync(user);
+
             var model = new UserEditViewModel
             {
                 Id = user.Id,
@@ -102,13 +132,14 @@ namespace SF.Controllers
                 CompanyId = user.CompanyId,
                 TelephoneNumber = user.TelephoneNumber,
                 FaxNumber = user.FaxNumber,
-                RoleName = (await _userManager.GetRolesAsync(user)).FirstOrDefault() // Get current role
+                Roles = (await _roleManager.Roles.ToListAsync()).Select(role => new RoleViewModel
+                {
+                    RoleName = role.Name,
+                    IsSelected = _userManager.IsInRoleAsync(user, role.Name).Result
+                }).ToList()
             };
 
-            // Load companies and roles into ViewData for dropdowns
             ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
-            ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
-
             return View(model);
         }
 
@@ -120,7 +151,11 @@ namespace SF.Controllers
             {
                 // Reload dropdowns if validation fails
                 ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
-                ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
+                model.Roles = (await _roleManager.Roles.ToListAsync()).Select(role => new RoleViewModel
+                {
+                    RoleName = role.Name,
+                    IsSelected = model.SelectedRoles.Contains(role.Name)
+                }).ToList();
                 return View(model);
             }
 
@@ -137,29 +172,42 @@ namespace SF.Controllers
             user.TelephoneNumber = model.TelephoneNumber;
             user.FaxNumber = model.FaxNumber;
 
-            // Check and update role
+            // Handle roles
             var currentRoles = await _userManager.GetRolesAsync(user);
-            if (model.RoleName != currentRoles.FirstOrDefault())
+            var rolesToAdd = model.SelectedRoles.Except(currentRoles).ToList();
+            var rolesToRemove = currentRoles.Except(model.SelectedRoles).ToList();
+
+            if (rolesToRemove.Any())
             {
-                await _userManager.RemoveFromRolesAsync(user, currentRoles);
-                await _userManager.AddToRoleAsync(user, model.RoleName);
+                await _userManager.RemoveFromRolesAsync(user, rolesToRemove);
             }
 
-            var updateResult = await _userManager.UpdateAsync(user);
-            if (updateResult.Succeeded)
+            if (rolesToAdd.Any())
+            {
+                await _userManager.AddToRolesAsync(user, rolesToAdd);
+            }
+
+            // Update the user
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
             {
                 return RedirectToAction(nameof(Index));
             }
 
             // Handle update errors
-            foreach (var error in updateResult.Errors)
+            foreach (var error in result.Errors)
             {
                 ModelState.AddModelError("", error.Description);
             }
 
             // Reload dropdowns if there's an error
             ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
-            ViewData["Roles"] = new SelectList(await _roleManager.Roles.ToListAsync(), "Name", "Name");
+            model.Roles = (await _roleManager.Roles.ToListAsync()).Select(role => new RoleViewModel
+            {
+                RoleName = role.Name,
+                IsSelected = model.SelectedRoles.Contains(role.Name)
+            }).ToList();
+
             return View(model);
         }
 
@@ -199,7 +247,7 @@ namespace SF.Controllers
         }
 
         // GET: User/ResetPassword/5
-        [Authorize(Roles = "Admin, SuperAdmin")]
+        //[Authorize(Roles = "Admin, SuperAdmin")]
         public IActionResult ResetPassword(string id)
         {
             if (id == null)
@@ -214,7 +262,7 @@ namespace SF.Controllers
         // POST: User/ResetPassword/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin, SuperAdmin")]
+        //[Authorize(Roles = "Admin, SuperAdmin")]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             if (!ModelState.IsValid)

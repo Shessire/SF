@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
 namespace SF.ViewModel
 {
@@ -30,8 +31,10 @@ namespace SF.ViewModel
         public int CompanyId { get; set; }
 
         [Required]
-        [Display(Name = "Role")]
-        public string RoleName { get; set; }
+        [Display(Name = "Roles")]
+        public List<string> SelectedRoles { get; set; } = new();
+
+        public List<RoleViewModel> Roles { get; set; } = new();
 
         public string TelephoneNumber { get; set; }
 
