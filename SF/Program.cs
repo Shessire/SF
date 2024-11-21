@@ -13,11 +13,25 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+//builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<DbInitializer>();
+
+builder.Services.AddRazorPages();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+});
+
 
 var app = builder.Build();
 
@@ -31,10 +45,17 @@ if (!app.Environment.IsDevelopment())
 
 using (var scope = app.Services.CreateScope())
 {
-         var services = scope.ServiceProvider;
-         var context = services.GetRequiredService<ApplicationDbContext>();
-         var dbInitializer = new DbInitializer(context);
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var dbInitializer = services.GetRequiredService<DbInitializer>();
         await dbInitializer.InitializeAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error during database initialization: {ex.Message}");
+    }
 }
 
 app.UseHttpsRedirection();
@@ -42,8 +63,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapRazorPages();
 
 
 app.MapControllerRoute(
