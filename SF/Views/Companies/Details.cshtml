@@ -34,7 +34,16 @@
                     <tr>
                         <td>@user.FirstName @user.LastName</td>
                         <td>@user.Email</td>
-                        <td>@Model.UserRoles[user.Id]</td>
+                        <td>
+                            @if (Model.UserRoles.ContainsKey(user.Id))
+                            {
+                                @string.Join(", ", Model.UserRoles[user.Id])
+                            }
+                            else
+                            {
+                                <span>No roles assigned</span>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

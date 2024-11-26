@@ -48,25 +48,21 @@ namespace SF.Controllers
                 return NotFound();
             }
 
-            var userRoles = new Dictionary<string, string>();
+            var userRoles = new Dictionary<string, List<string>>();
 
-            if (company.Users != null)
+            foreach (var user in company.Users)
             {
-                foreach (var user in company.Users)
-                {
-                    var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
-                    userRoles[user.Id] = role ?? "No Role Assigned"; // Handle case where role is null
-                }
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoles[user.Id] = roles.ToList();
             }
 
-            // Pass company and user roles to the view
-            var viewModel = new CompanyDetailsViewModel
+            var model = new CompanyDetailsViewModel
             {
                 Company = company,
                 UserRoles = userRoles
             };
 
-            return View(viewModel);
+            return View(model);
         }
 
         // GET: Companies/Create
