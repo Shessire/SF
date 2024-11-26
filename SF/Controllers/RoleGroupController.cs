@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SF.Data;
 using SF.Models;
+using SF.ViewModel;
 
 namespace SF.Controllers
 {
@@ -66,16 +67,99 @@ namespace SF.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Details(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var roleGroup = await _context.RoleGroups
                 .Include(rg => rg.RoleGroupRoles)
                 .FirstOrDefaultAsync(rg => rg.Id == id);
 
             if (roleGroup == null)
+            {
                 return NotFound();
+            }
 
-            return View(roleGroup);
+            // Fetch all roles to allow updating the role group
+            var allRoles = await _roleManager.Roles.ToListAsync();
+
+            var model = new RoleGroupEditViewModel
+            {
+                Id = roleGroup.Id,
+                Name = roleGroup.Name,
+                SelectedRoles = roleGroup.RoleGroupRoles.Select(rgr => rgr.RoleName).ToList(),
+                AvailableRoles = allRoles.Select(r => new RoleViewModel
+                {
+                    RoleName = r.Name,
+                    IsSelected = roleGroup.RoleGroupRoles.Any(rgr => rgr.RoleName == r.Name)
+                }).ToList()
+            };
+
+            return View(model);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(RoleGroupEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Reload available roles if validation fails
+                var allRoles = await _roleManager.Roles.ToListAsync();
+                model.AvailableRoles = allRoles.Select(r => new RoleViewModel
+                {
+                    RoleName = r.Name,
+                    IsSelected = model.SelectedRoles.Contains(r.Name)
+                }).ToList();
+                return View(model);
+            }
+
+            var roleGroup = await _context.RoleGroups
+                .Include(rg => rg.RoleGroupRoles)
+                .FirstOrDefaultAsync(rg => rg.Id == model.Id);
+
+            if (roleGroup == null)
+            {
+                return NotFound();
+            }
+
+            // Update the role group name
+            roleGroup.Name = model.Name;
+
+            // Update roles
+            _context.RoleGroupRoles.RemoveRange(roleGroup.RoleGroupRoles); // Remove existing roles
+            foreach (var roleName in model.SelectedRoles)
+            {
+                roleGroup.RoleGroupRoles.Add(new RoleGroupRoles
+                {
+                    RoleGroupId = model.Id,
+                    RoleName = roleName
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var roleGroup = await _context.RoleGroups
+                .Include(rg => rg.RoleGroupRoles)
+                .FirstOrDefaultAsync(rg => rg.Id == id);
+
+            if (roleGroup == null)
+            {
+                return NotFound();
+            }
+
+            _context.RoleGroupRoles.RemoveRange(roleGroup.RoleGroupRoles); // Remove associated roles
+            _context.RoleGroups.Remove(roleGroup); // Remove the role group
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
