@@ -1,0 +1,35 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<IdentityRole>
+@{
+    ViewData["Title"] = "Create Role Group";
+}
+
+<h2>Create Role Group</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label>Group Name</label>
+        <input type="text" name="groupName" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label>Select Roles</label>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var role in Model)
+            {
+                <div class="form-check">
+                    <input type="checkbox" name="selectedRoles" value="@role.Name" class="form-check-input" id="@role.Name" />
+                    <label class="form-check-label" for="@role.Name">@role.Name</label>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No roles available.</p>
+        }
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

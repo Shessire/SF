@@ -46,15 +46,17 @@ namespace SF.Controllers
             };
 
             ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+            ViewData["RoleGroups"] = new SelectList(await _context.RoleGroups.ToListAsync(), "Id", "Name");
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UserCreateViewModel model)
+        public async Task<IActionResult> Create(UserCreateViewModel model, int? RoleGroupId)
         {
             if (!ModelState.IsValid)
             {
+                // Reload Roles and RoleGroups for the View
                 model.Roles = await _roleManager.Roles
                     .Select(r => new RoleViewModel
                     {
@@ -64,9 +66,11 @@ namespace SF.Controllers
                     .ToListAsync();
 
                 ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+                ViewData["RoleGroups"] = new SelectList(await _context.RoleGroups.ToListAsync(), "Id", "Name");
                 return View(model);
             }
 
+            // Create the user
             var user = new ApplicationUser
             {
                 UserName = model.Email,
@@ -86,6 +90,7 @@ namespace SF.Controllers
                     ModelState.AddModelError("", error.Description);
                 }
 
+                // Reload Roles and RoleGroups for the View
                 model.Roles = await _roleManager.Roles
                     .Select(r => new RoleViewModel
                     {
@@ -95,17 +100,40 @@ namespace SF.Controllers
                     .ToListAsync();
 
                 ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+                ViewData["RoleGroups"] = new SelectList(await _context.RoleGroups.ToListAsync(), "Id", "Name");
                 return View(model);
             }
 
-            // Assign roles
-            foreach (var roleName in model.SelectedRoles)
+            // Assign selected roles
+            if (model.SelectedRoles != null && model.SelectedRoles.Any())
             {
-                await _userManager.AddToRoleAsync(user, roleName);
+                foreach (var roleName in model.SelectedRoles)
+                {
+                    await _userManager.AddToRoleAsync(user, roleName);
+                }
+            }
+
+            // Assign roles from the selected RoleGroup
+            if (RoleGroupId.HasValue)
+            {
+                var roleGroupRoles = await _context.RoleGroupRoles
+                    .Where(rgr => rgr.RoleGroupId == RoleGroupId.Value)
+                    .Select(rgr => rgr.RoleName)
+                    .ToListAsync();
+
+                foreach (var roleName in roleGroupRoles)
+                {
+                    // Avoid duplicate roles
+                    if (!await _userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await _userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
             }
 
             return RedirectToAction(nameof(Index));
         }
+
 
         // GET: User/Edit/5
         public async Task<IActionResult> Edit(string id)
