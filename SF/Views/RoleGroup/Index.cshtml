@@ -2,7 +2,7 @@
 
 <h2>Role Groups</h2>
 
-<a asp-action="Create" class="btn btn-primary">Create New Role Group</a>
+<a asp-action="Create" class="btn btn-primary mb-3">Create New Role Group</a>
 
 <table class="table">
     <thead>
@@ -20,11 +20,61 @@
                 <td>@string.Join(", ", group.RoleGroupRoles.Select(r => r.RoleName))</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@group.Id" class="btn btn-warning">Edit</a>
-                    <form asp-action="Delete" asp-route-id="@group.Id" method="post" class="d-inline">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this role group?');">Delete</button>
-                    </form>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="@group.Id" data-name="@group.Name">
+                        Delete
+                    </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the role group <strong id="roleGroupName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all the delete buttons
+            const deleteButtons = document.querySelectorAll('button[data-toggle="modal"]');
+
+            // Loop through each delete button
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const roleGroupName = this.getAttribute('data-name');  // Get the role group name from the button data attribute
+                    const roleGroupId = this.getAttribute('data-id');      // Get the role group ID
+
+                    // Update the modal with the role group name
+                    document.getElementById('roleGroupName').textContent = roleGroupName;
+
+                    // Update the form action for deletion
+                    const deleteForm = document.getElementById('deleteForm');
+                    deleteForm.action = '/RoleGroup/Delete/' + roleGroupId;  // Set the correct URL for deletion
+                });
+            });
+        });
+    </script>
+}
+
+
