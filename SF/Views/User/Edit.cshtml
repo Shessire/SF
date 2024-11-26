@@ -65,6 +65,25 @@
     </div>
 
     <div class="form-group">
+        <label for="RoleGroupId">Role Group</label>
+        <select name="RoleGroupId" id="RoleGroupId" class="form-control">
+            <option value="">Select Role Group</option>
+            @if (ViewData["RoleGroups"] is SelectList roleGroups && roleGroups.Any())
+            {
+                foreach (var group in roleGroups)
+                {
+                    <option value="@group.Value">@group.Text</option>
+                }
+            }
+            else
+            {
+                <option value="">No Role Groups Available</option>
+            }
+        </select>
+    </div>
+
+
+    <div class="form-group">
         <label asp-for="TelephoneNumber"></label>
         <input asp-for="TelephoneNumber" class="form-control" />
         <span asp-validation-for="TelephoneNumber" class="text-danger"></span>

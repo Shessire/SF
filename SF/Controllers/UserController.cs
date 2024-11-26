@@ -167,18 +167,20 @@ namespace SF.Controllers
                 }).ToList()
             };
 
+            ViewData["RoleGroups"] = new SelectList(await _context.RoleGroups.ToListAsync(), "Id", "Name");
             ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UserEditViewModel model)
+        public async Task<IActionResult> Edit(UserEditViewModel model, int? RoleGroupId)
         {
             if (!ModelState.IsValid)
             {
                 // Reload dropdowns if validation fails
                 ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+                ViewData["RoleGroups"] = new SelectList(await _context.RoleGroups.ToListAsync(), "Id", "Name");
                 model.Roles = (await _roleManager.Roles.ToListAsync()).Select(role => new RoleViewModel
                 {
                     RoleName = role.Name,
@@ -215,6 +217,23 @@ namespace SF.Controllers
                 await _userManager.AddToRolesAsync(user, rolesToAdd);
             }
 
+            // Handle RoleGroup selection
+            if (RoleGroupId.HasValue)
+            {
+                var roleGroupRoles = await _context.RoleGroupRoles
+                    .Where(rgr => rgr.RoleGroupId == RoleGroupId.Value)
+                    .Select(rgr => rgr.RoleName)
+                    .ToListAsync();
+
+                foreach (var roleName in roleGroupRoles)
+                {
+                    if (!await _userManager.IsInRoleAsync(user, roleName))
+                    {
+                        await _userManager.AddToRoleAsync(user, roleName);
+                    }
+                }
+            }
+
             // Update the user
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
@@ -230,6 +249,7 @@ namespace SF.Controllers
 
             // Reload dropdowns if there's an error
             ViewData["Companies"] = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
+            ViewData["RoleGroups"] = new SelectList(await _context.RoleGroups.ToListAsync(), "Id", "Name");
             model.Roles = (await _roleManager.Roles.ToListAsync()).Select(role => new RoleViewModel
             {
                 RoleName = role.Name,
