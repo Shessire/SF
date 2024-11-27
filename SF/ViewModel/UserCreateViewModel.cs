@@ -26,9 +26,8 @@ namespace SF.ViewModel
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword { get; set; }
 
-        [Required]
         [Display(Name = "Company")]
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
 
         [Required]
         [Display(Name = "Roles")]

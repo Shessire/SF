@@ -29,6 +29,12 @@ namespace SF.Data
                 .HasOne(rgr => rgr.RoleGroup)
                 .WithMany(rg => rg.RoleGroupRoles)
                 .HasForeignKey(rgr => rgr.RoleGroupId);
+
+            builder.Entity<ApplicationUser>()
+                .HasOne(u => u.Company)
+                .WithMany(c => c.Users)
+                .HasForeignKey(u => u.CompanyId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

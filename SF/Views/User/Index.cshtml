@@ -35,7 +35,7 @@
                         <tr>
                             <td>@user.FirstName @user.LastName</td>
                             <td>@user.Email</td>
-                            <td>@user.Company?.Name</td>
+                            <td>@(user.CompanyId == null ? "Not Assigned" : user.Company?.Name)</td>
                             <td>@user.TelephoneNumber</td>
                             <td>@user.FaxNumber</td>
                             <td>@string.Join(", ", await UserManager.GetRolesAsync(user))</td>

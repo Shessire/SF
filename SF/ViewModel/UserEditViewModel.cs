@@ -20,9 +20,8 @@ namespace SF.ViewModel
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
         [Display(Name = "Company")]
-        public int CompanyId { get; set; }
+        public int? CompanyId { get; set; }
 
         [Required]
         [Display(Name = "Roles")]
