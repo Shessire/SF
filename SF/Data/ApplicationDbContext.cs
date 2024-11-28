@@ -15,6 +15,9 @@ namespace SF.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<RoleGroup> RoleGroups { get; set; }
         public DbSet<RoleGroupRoles> RoleGroupRoles { get; set; }
+        public DbSet<BusinessPartner> BusinessPartners { get; set; }
+        public DbSet<Address> Addresses { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder builder)
