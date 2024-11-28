@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<BusinessPartner>
 
-<h2>Business Partners</h2>
-<a asp-action="Create" class="btn btn-primary mb-3">Add New Partner</a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Business Partners</h1>
+    <a asp-action="Create" class="btn btn-primary">Add New Partner</a>
+</div>
 
 <table class="table table-bordered">
     <thead>
@@ -23,7 +25,8 @@
                 <td>@partner.Category</td>
                 <td>@partner.EntityType</td>
                 <td>
-                    <a asp-controller="Address" asp-action="Index" asp-route-id="@partner.Id" class="btn btn-link">View Addresses</a>
+                    <a asp-controller="Address" asp-action="Index" asp-route-id="@partner.Id" class="btn btn-success">View Addresses</a>
+                    <a asp-controller="Contact" asp-action="ListByPartner" asp-route-partnerId="@partner.Id" class="btn btn-info">View Contacts</a>
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@partner.Id" class="btn btn-warning">Edit</a>
