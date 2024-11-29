@@ -2,7 +2,7 @@
 
 <h2>Add Business Partner</h2>
 <form asp-action="Create" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="form-group">
         <label asp-for="Name"></label>
@@ -12,17 +12,21 @@
     <div class="form-group">
         <label asp-for="Category"></label>
         <select asp-for="Category" class="form-control">
+            <option value="" disabled selected>--- Select a Category ---</option>
             <option value="Customer">Customer</option>
             <option value="Supplier">Supplier</option>
         </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="EntityType"></label>
         <select asp-for="EntityType" class="form-control">
+            <option value="" disabled selected>--- Select an Entity Type ---</option>
             <option value="Corporate">Corporate</option>
             <option value="Individual">Individual</option>
         </select>
+        <span asp-validation-for="EntityType" class="text-danger"></span>
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Save</button>
 </form>

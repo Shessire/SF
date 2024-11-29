@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Address>
+
+<h2>Addresses</h2>
+
+<a asp-action="Create" class="btn btn-primary">Add Address</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Address 2</th>
+            <th>Postal Code</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var address in Model)
+        {
+            <tr>
+                <td>@address.Name</td>
+                <td>@address.AddressPri</td>
+                <td>@address.AddressOpt</td>
+                <td>@address.PostalCode</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@address.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@address.Id" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a asp-controller="Contact" asp-action="Index" asp-route-addressId="@address.Id" class="btn btn-info">Contacts</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

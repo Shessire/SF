@@ -28,7 +28,7 @@ namespace SF.Controllers
                 .Where(a => a.BusinessPartnerId == partnerId)
                 .SelectMany(a => a.Contacts.Select(c => new ContactViewModel
                 {
-                    Address = $"{a.Street}, {a.City}, {a.PostalCode}",
+                    Address = $"{a.AddressPri}" + (string.IsNullOrWhiteSpace(a.AddressOpt) ? "" : $", {a.AddressOpt}"),
                     ContactName = c.Name,
                     Title = c.Title,
                     Tel = c.Tel,

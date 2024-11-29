@@ -1,0 +1,42 @@
+﻿@model Address
+
+<h2>Add Address</h2>
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="AddressPri"></label>
+        <input asp-for="AddressPri" class="form-control" />
+        <span asp-validation-for="AddressPri" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="AddressOpt"></label>
+        <input asp-for="AddressOpt" class="form-control" />
+        <span asp-validation-for="AddressOpt" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="PostalCode"></label>
+        <input asp-for="PostalCode" class="form-control" />
+        <span asp-validation-for="PostalCode" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Country"></label>
+        <input asp-for="Country" class="form-control" />
+        <span asp-validation-for="Country" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="TaxBranchCode"></label>
+        <input asp-for="TaxBranchCode" class="form-control" />
+        <span asp-validation-for="TaxBranchCode" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="BusinessPartnerId"></label>
+        <select asp-for="BusinessPartnerId" class="form-control" asp-items="@(ViewData["BusinessPartners"] as SelectList)"></select>
+        <span asp-validation-for="BusinessPartnerId" class="text-danger"></span>
+    </div>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
