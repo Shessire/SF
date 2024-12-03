@@ -43,12 +43,16 @@ namespace SF.Controllers
             return View(address);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var address = await _context.Addresses.FindAsync(id);
-            if (address == null) return NotFound();
+            if (address == null)
+            {
+                return NotFound();
+            }
 
-            ViewData["BusinessPartners"] = new SelectList(_context.BusinessPartners, "Id", "Name", address.BusinessPartnerId);
+            ViewData["BusinessPartners"] = new SelectList(await _context.BusinessPartners.ToListAsync(), "Id", "Name", address.BusinessPartnerId);
             return View(address);
         }
 
@@ -56,25 +60,42 @@ namespace SF.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Address address)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                ViewData["BusinessPartners"] = new SelectList(await _context.BusinessPartners.ToListAsync(), "Id", "Name", address.BusinessPartnerId);
+                return View(address);
+            }
+
+            try
             {
                 _context.Update(address);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BusinessPartners"] = new SelectList(_context.BusinessPartners, "Id", "Name", address.BusinessPartnerId);
-            return View(address);
+            catch (DbUpdateException ex)
+            {
+                ModelState.AddModelError("", "Error updating the address. Please ensure the business partner exists.");
+                ViewData["BusinessPartners"] = new SelectList(await _context.BusinessPartners.ToListAsync(), "Id", "Name", address.BusinessPartnerId);
+                return View(address);
+            }
         }
 
+
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var address = await _context.Addresses.FindAsync(id);
-            if (address == null) return NotFound();
+            if (address == null)
+            {
+                return NotFound();
+            }
 
             _context.Addresses.Remove(address);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
     }
 }
