@@ -45,10 +45,9 @@
 
     <div class="form-group">
         <label asp-for="BusinessPartnerId"></label>
-        <select asp-for="BusinessPartnerId" class="form-control" asp-items="@(ViewData["BusinessPartners"] as SelectList)">
-            <option value="">--- Select Business Partner ---</option>
-        </select>
+        <select asp-for="BusinessPartnerId" class="form-control" asp-items="@(ViewData["BusinessPartners"] as SelectList)" disabled></select>
         <span asp-validation-for="BusinessPartnerId" class="text-danger"></span>
+        <input type="hidden" asp-for="BusinessPartnerId" />
     </div>
 
 

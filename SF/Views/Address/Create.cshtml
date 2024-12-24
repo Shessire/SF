@@ -35,9 +35,10 @@
     </div>
     <div class="form-group">
         <label asp-for="BusinessPartnerId"></label>
-        <select asp-for="BusinessPartnerId" class="form-control" asp-items="@(ViewData["BusinessPartners"] as SelectList)"></select>
+        <select asp-for="BusinessPartnerId" class="form-control" asp-items="@(ViewData["BusinessPartners"] as SelectList)" disabled></select>
         <span asp-validation-for="BusinessPartnerId" class="text-danger"></span>
+        <input type="hidden" asp-for="BusinessPartnerId" />
     </div>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="Index" asp-route-partnerId="@Model.BusinessPartnerId" class="btn btn-secondary">Cancel</a>
     <button type="submit" class="btn btn-primary">Save</button>
 </form>

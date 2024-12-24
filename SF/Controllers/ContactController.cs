@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SF.Data;
+using SF.Models;
 using SF.ViewModel;
 
 namespace SF.Controllers
@@ -14,41 +15,150 @@ namespace SF.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> ListByPartner(int partnerId)
+        public async Task<IActionResult> Index(int addressId)
         {
-            // Fetch business partner name
-            var partner = await _context.BusinessPartners.FindAsync(partnerId);
-            if (partner == null)
+            var address = await _context.Addresses
+                .Include(a => a.BusinessPartner)
+                .FirstOrDefaultAsync(a => a.Id == addressId);
+
+            if (address == null)
             {
                 return NotFound();
             }
 
-            // Fetch addresses and their contacts
-            var contacts = await _context.Addresses
-                .Where(a => a.BusinessPartnerId == partnerId)
-                .SelectMany(a => a.Contacts.Select(c => new ContactViewModel
-                {
-                    Address = $"{a.AddressPri}" + (string.IsNullOrWhiteSpace(a.AddressOpt) ? "" : $", {a.AddressOpt}"),
-                    ContactName = c.Name,
-                    Title = c.Title,
-                    Tel = c.Tel,
-                    Mobile = c.Mobile,
-                    Email = c.Email
-                }))
+            var contacts = await _context.Contacts
+                .Where(c => c.AddressId == addressId)
                 .ToListAsync();
 
-
-            // Pass data to the view
             var model = new ContactListViewModel
             {
-                BusinessPartnerName = partner.Name,
-                ContactsGroupedByAddress = contacts
-                    .GroupBy(c => c.Address)
-                    .ToDictionary(g => g.Key, g => g.ToList())
+                Address = $"{address.AddressPri}" + (string.IsNullOrWhiteSpace(address.AddressOpt) ? "" : $", {address.AddressOpt}"),
+                BusinessPartnerName = address.BusinessPartner.Name,
+                Contacts = contacts
             };
 
-
             return View(model);
+        }
+
+        // Create a Contact
+        public IActionResult Create(int addressId)
+        {
+            var address = _context.Addresses
+                .Include(a => a.BusinessPartner)
+                .FirstOrDefault(a => a.Id == addressId);
+
+            if (address == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Address"] = address;
+            return View(new Contact { AddressId = addressId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Contact contact)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(contact);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index), new { addressId = contact.AddressId });
+            }
+
+            var address = _context.Addresses
+                .Include(a => a.BusinessPartner)
+                .FirstOrDefault(a => a.Id == contact.AddressId);
+
+            ViewData["Address"] = address;
+            return View(contact);
+        }
+
+        // Edit a Contact
+        public async Task<IActionResult> Edit(int id)
+        {
+            var contact = await _context.Contacts.FindAsync(id);
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            var address = await _context.Addresses
+                .Include(a => a.BusinessPartner)
+                .FirstOrDefaultAsync(a => a.Id == contact.AddressId);
+
+            ViewData["Address"] = address;
+            return View(contact);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Contact contact)
+        {
+            if (id != contact.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(contact);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ContactExists(contact.Id))
+                    {
+                        return NotFound();
+                    }
+                    throw;
+                }
+                return RedirectToAction(nameof(Index), new { addressId = contact.AddressId });
+            }
+
+            var address = await _context.Addresses
+                .Include(a => a.BusinessPartner)
+                .FirstOrDefaultAsync(a => a.Id == contact.AddressId);
+
+            ViewData["Address"] = address;
+            return View(contact);
+        }
+
+        // Delete a Contact
+        public async Task<IActionResult> Delete(int id)
+        {
+            var contact = await _context.Contacts
+                .Include(c => c.Address)
+                .ThenInclude(a => a.BusinessPartner)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            return View(contact);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var contact = await _context.Contacts.FindAsync(id);
+            if (contact != null)
+            {
+                _context.Contacts.Remove(contact);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index), new { addressId = contact?.AddressId });
+        }
+
+        private bool ContactExists(int id)
+        {
+            return _context.Contacts.Any(e => e.Id == id);
         }
     }
 }

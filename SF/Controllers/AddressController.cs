@@ -43,7 +43,7 @@ namespace SF.Controllers
                 return RedirectToAction("Index", "BusinessPartner");
             }
 
-            ViewData["BusinessPartner"] = businessPartner;
+            ViewData["BusinessPartners"] = new SelectList(_context.BusinessPartners, "Id", "Name", partnerId);
             return View(new Address { BusinessPartnerId = partnerId });
         }
 
@@ -88,16 +88,15 @@ namespace SF.Controllers
             {
                 _context.Update(address);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { partnerId = address.BusinessPartnerId });
             }
-            catch (DbUpdateException ex)
+            catch (DbUpdateException)
             {
                 ModelState.AddModelError("", "Error updating the address. Please ensure the business partner exists.");
                 ViewData["BusinessPartners"] = new SelectList(await _context.BusinessPartners.ToListAsync(), "Id", "Name", address.BusinessPartnerId);
                 return View(address);
             }
         }
-
 
 
         [HttpPost]

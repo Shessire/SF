@@ -3,7 +3,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Addresses</h2>
-    <a asp-action="Create" class="btn btn-primary">Add Address</a>
+    <a asp-action="Create" asp-route-partnerId="@ViewBag.PartnerId" class="btn btn-primary">Add Address</a>
 </div>
 
 <table class="table">
@@ -30,7 +30,7 @@
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@address.Id" class="btn btn-warning">Edit</a>
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal" data-id="@address.Id" data-name="@address.Name">
+                    <button type="button" class="btn btn-danger delete-button" data-toggle="modal" data-target="#deleteModal" data-id="@address.Id" data-name="@address.Name">
                         Delete
                     </button>
                 </td>
@@ -51,7 +51,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete the address <strong id="addressName"></strong>?
+                Are you sure you want to delete <strong id="addressName"></strong>?
             </div>
             <div class="modal-footer">
                 <form id="deleteForm" method="post">

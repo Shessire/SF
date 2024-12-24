@@ -26,7 +26,7 @@
                 <td>@partner.EntityType</td>
                 <td>
                     <a asp-controller="Address" asp-action="Index" asp-route-partnerId="@partner.Id" class="btn btn-success">Addresses</a>
-                    <a asp-controller="Contact" asp-action="ListByPartner" asp-route-partnerId="@partner.Id" class="btn btn-info">Contacts</a>
+                    <a asp-controller="Contact" asp-action="Index" asp-route-partnerId="@partner.Id" class="btn btn-info">Contacts</a>
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@partner.Id" class="btn btn-warning">Edit</a>

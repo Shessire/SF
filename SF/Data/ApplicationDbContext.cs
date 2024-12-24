@@ -17,6 +17,7 @@ namespace SF.Data
         public DbSet<RoleGroupRoles> RoleGroupRoles { get; set; }
         public DbSet<BusinessPartner> BusinessPartners { get; set; }
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
 
 
 
@@ -38,6 +39,12 @@ namespace SF.Data
                 .WithMany(c => c.Users)
                 .HasForeignKey(u => u.CompanyId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            builder.Entity<Address>()
+                .HasMany(a => a.Contacts)
+                .WithOne(c => c.Address)
+                .HasForeignKey(c => c.AddressId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
