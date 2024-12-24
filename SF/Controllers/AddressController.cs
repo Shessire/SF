@@ -15,18 +15,36 @@ namespace SF.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? partnerId)
         {
+            if (partnerId == null)
+            {
+                // Optionally redirect to an error page or BusinessPartners list if partnerId is missing
+                return RedirectToAction("Index", "BusinessPartner");
+            }
+
+            // Fetch addresses specific to the BusinessPartner
             var addresses = await _context.Addresses
+                .Where(a => a.BusinessPartnerId == partnerId)
                 .Include(a => a.BusinessPartner)
                 .ToListAsync();
+
+            // Pass BusinessPartnerId to the ViewBag for navigation
+            ViewBag.PartnerId = partnerId;
+
             return View(addresses);
         }
 
-        public IActionResult Create()
+        public IActionResult Create(int partnerId)
         {
-            ViewData["BusinessPartners"] = new SelectList(_context.BusinessPartners, "Id", "Name");
-            return View();
+            var businessPartner = _context.BusinessPartners.FirstOrDefault(bp => bp.Id == partnerId);
+            if (businessPartner == null)
+            {
+                return RedirectToAction("Index", "BusinessPartner");
+            }
+
+            ViewData["BusinessPartner"] = businessPartner;
+            return View(new Address { BusinessPartnerId = partnerId });
         }
 
         [HttpPost]
@@ -37,9 +55,9 @@ namespace SF.Controllers
             {
                 _context.Add(address);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { partnerId = address.BusinessPartnerId });
             }
-            ViewData["BusinessPartners"] = new SelectList(_context.BusinessPartners, "Id", "Name");
+            ViewData["BusinessPartners"] = new SelectList(_context.BusinessPartners, "Id", "Name", address.BusinessPartnerId);
             return View(address);
         }
 
@@ -92,9 +110,12 @@ namespace SF.Controllers
                 return NotFound();
             }
 
+            int partnerId = address.BusinessPartnerId;
+
             _context.Addresses.Remove(address);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Index), new { partnerId });
         }
 
     }
