@@ -3,16 +3,16 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h2>Business Partner: @Model.BusinessPartnerName</h2>
-        <h4>Address: @Model.Address</h4>
+        <h4>Address Name: @Model.AddressName</h4>
     </div>
-    <a asp-action="Create" asp-route-addressId="@ViewData["AddressId"]" class="btn btn-success">Add New Contact</a>
+    <a asp-action="Create" asp-route-addressId="@ViewData["AddressId"]" class="btn btn-primary">Add New Contact</a>
 </div>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Name</th>
             <th>Title</th>
+            <th>Name</th>
             <th>Tel</th>
             <th>Mobile</th>
             <th>Email</th>
@@ -23,8 +23,8 @@
         @foreach (var contact in Model.Contacts)
         {
             <tr>
-                <td>@contact.Name</td>
                 <td>@contact.Title</td>
+                <td>@contact.Name</td>
                 <td>@contact.Tel</td>
                 <td>@contact.Mobile</td>
                 <td>@contact.Email</td>

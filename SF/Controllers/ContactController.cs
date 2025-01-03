@@ -35,7 +35,7 @@ namespace SF.Controllers
             var model = new ContactListViewModel
             {
                 AddressId = addressId,
-                Address = $"{address.AddressPri}" + (string.IsNullOrWhiteSpace(address.AddressOpt) ? "" : $", {address.AddressOpt}"),
+                AddressName = address.Name,
                 BusinessPartnerName = address.BusinessPartner.Name,
                 BusinessPartnerId = address.BusinessPartnerId,
                 Contacts = contacts
@@ -179,5 +179,28 @@ namespace SF.Controllers
         {
             return _context.Contacts.Any(e => e.Id == id);
         }
+
+        public async Task<IActionResult> AllContactsForPartner(int partnerId)
+        {
+            var contacts = await _context.Contacts
+                .Include(c => c.Address) // Include related Address
+                .Where(c => c.Address.BusinessPartnerId == partnerId) // Filter by BusinessPartnerId
+                .ToListAsync();
+
+            var partner = await _context.BusinessPartners
+                .FirstOrDefaultAsync(bp => bp.Id == partnerId);
+
+            if (partner == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["PartnerId"] = partnerId;
+            ViewData["PartnerName"] = partner.Name;
+
+            return View(contacts);
+        }
+
+
     }
 }
