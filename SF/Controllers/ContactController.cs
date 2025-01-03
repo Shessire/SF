@@ -17,6 +17,8 @@ namespace SF.Controllers
 
         public async Task<IActionResult> Index(int addressId)
         {
+            ViewData["AddressId"] = addressId;
+
             var address = await _context.Addresses
                 .Include(a => a.BusinessPartner)
                 .FirstOrDefaultAsync(a => a.Id == addressId);
@@ -32,27 +34,33 @@ namespace SF.Controllers
 
             var model = new ContactListViewModel
             {
+                AddressId = addressId,
                 Address = $"{address.AddressPri}" + (string.IsNullOrWhiteSpace(address.AddressOpt) ? "" : $", {address.AddressOpt}"),
                 BusinessPartnerName = address.BusinessPartner.Name,
+                BusinessPartnerId = address.BusinessPartnerId,
                 Contacts = contacts
             };
 
             return View(model);
         }
 
-        // Create a Contact
         public IActionResult Create(int addressId)
         {
+            // Ensure the Address exists before proceeding
             var address = _context.Addresses
                 .Include(a => a.BusinessPartner)
                 .FirstOrDefault(a => a.Id == addressId);
 
             if (address == null)
             {
-                return NotFound();
+                return NotFound("Address not found.");
             }
 
-            ViewData["Address"] = address;
+            ViewData["Address"] = $"{address.AddressPri}" +
+                                  (!string.IsNullOrWhiteSpace(address.AddressOpt) ? $", {address.AddressOpt}" : "");
+            ViewData["BusinessPartnerName"] = address.BusinessPartner.Name;
+
+            // Pass AddressId to the view
             return View(new Contact { AddressId = addressId });
         }
 
@@ -60,6 +68,13 @@ namespace SF.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Contact contact)
         {
+            // Validate Address existence
+            var address = _context.Addresses.FirstOrDefault(a => a.Id == contact.AddressId);
+            if (address == null)
+            {
+                ModelState.AddModelError("", "Associated Address is invalid or does not exist.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(contact);
@@ -67,13 +82,17 @@ namespace SF.Controllers
                 return RedirectToAction(nameof(Index), new { addressId = contact.AddressId });
             }
 
-            var address = _context.Addresses
-                .Include(a => a.BusinessPartner)
-                .FirstOrDefault(a => a.Id == contact.AddressId);
+            // Provide context back to the View in case of errors
+            if (address != null)
+            {
+                ViewData["Address"] = $"{address.AddressPri}" +
+                                      (!string.IsNullOrWhiteSpace(address.AddressOpt) ? $", {address.AddressOpt}" : "");
+                ViewData["BusinessPartnerName"] = address.BusinessPartner?.Name;
+            }
 
-            ViewData["Address"] = address;
             return View(contact);
         }
+
 
         // Edit a Contact
         public async Task<IActionResult> Edit(int id)
