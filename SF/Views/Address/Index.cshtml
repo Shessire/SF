@@ -6,7 +6,9 @@
     <a asp-action="Create" asp-route-partnerId="@ViewBag.PartnerId" class="btn btn-primary">Add Address</a>
 </div>
 
-<table class="table">
+<input type="hidden" id="PartnerId" value="@ViewBag.PartnerId" />
+
+<table id="addressTable" class="table">
     <thead>
         <tr>
             <th>Name</th>
@@ -83,6 +85,42 @@
                     deleteForm.action = `/Address/Delete/${addressId}`;
                 });
             });
+        });
+
+
+
+
+        $('#addressTable').DataTable({
+            ajax: {
+                url: '/Address/GetData',
+                type: 'GET',
+                data: {
+                    partnerId: $('#PartnerId').val()
+                }
+            },
+            columns: [
+                { data: 'name' },
+                { data: 'addressPri' },
+                { data: 'addressOpt' },
+                { data: 'postalCode' },
+                {
+                    data: 'id',
+                    render: function (data) {
+                        return `<a href="/Contact/Index?addressId=${data}" class="btn btn-info">Contacts</a>`;
+                    }
+                },
+                {
+                    data: 'id',
+                    render: function (data) {
+                        return `
+                                    <a href="/Address/Edit/${data}" class="btn btn-warning">Edit</a>
+                                    <button type="button" class="btn btn-danger delete-button" data-toggle="modal" data-target="#deleteModal" data-id="${data}" data-name="Address ${data}">
+                                        Delete
+                                    </button>
+                                `;
+                    }
+                }
+            ]
         });
     </script>
 }

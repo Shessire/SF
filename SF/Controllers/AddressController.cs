@@ -19,17 +19,14 @@ namespace SF.Controllers
         {
             if (partnerId == null)
             {
-                // Optionally redirect to an error page or BusinessPartners list if partnerId is missing
                 return RedirectToAction("Index", "BusinessPartner");
             }
 
-            // Fetch addresses specific to the BusinessPartner
             var addresses = await _context.Addresses
                 .Where(a => a.BusinessPartnerId == partnerId)
                 .Include(a => a.BusinessPartner)
                 .ToListAsync();
 
-            // Pass BusinessPartnerId to the ViewBag for navigation
             ViewBag.PartnerId = partnerId;
 
             return View(addresses);
@@ -116,6 +113,24 @@ namespace SF.Controllers
 
             return RedirectToAction(nameof(Index), new { partnerId });
         }
+
+        public async Task<IActionResult> GetData(int partnerId)
+        {
+            var addresses = await _context.Addresses
+                .Where(a => a.BusinessPartnerId == partnerId)
+                .Select(a => new
+                {
+                    a.Name,
+                    a.AddressPri,
+                    a.AddressOpt,
+                    a.PostalCode,
+                    a.Id
+                })
+                .ToListAsync();
+
+            return Json(new { data = addresses });
+        }
+
 
     }
 }
