@@ -201,6 +201,23 @@ namespace SF.Controllers
             return View(contacts);
         }
 
+        public async Task<IActionResult> GetData(int addressId)
+        {
+            var contacts = await _context.Contacts
+                .Where(c => c.AddressId == addressId)
+                .Select(c => new
+                {
+                    c.Title,
+                    c.Name,
+                    c.Tel,
+                    c.Mobile,
+                    c.Email,
+                    c.Id
+                }).ToListAsync();
+
+            return Json(new { data = contacts });
+        }
+
 
     }
 }
