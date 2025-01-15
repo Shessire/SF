@@ -80,5 +80,20 @@ namespace SF.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> GetData()
+        {
+            var partners = await _context.BusinessPartners
+                .Select(bp => new
+                {
+                    bp.Id,
+                    bp.Name,
+                    bp.Category,
+                    bp.EntityType
+                })
+                .ToListAsync();
+
+            return Json(new { data = partners });
+        }
+
     }
 }

@@ -5,7 +5,7 @@
     <a asp-action="Create" class="btn btn-primary">Add New Partner</a>
 </div>
 
-<table class="table table-bordered">
+<table id="businessPartnerTable" class="table">
     <thead>
         <tr>
             <th>ID</th>
@@ -39,3 +39,42 @@
         }
     </tbody>
 </table>
+
+
+@section Scripts {
+    <script>
+        $('#businessPartnerTable').DataTable({
+            ajax: {
+                url: '/BusinessPartner/GetData',
+                type: 'GET',
+                dataSrc: 'data'
+            },
+            columns: [
+                { data: 'id' },
+                { data: 'name' },
+                { data: 'category' },
+                { data: 'entityType' },
+                {
+                    data: 'id',
+                    render: function (data) {
+                        return `
+                            <a href="/Address/Index?partnerId=${data}" class="btn btn-success">Addresses</a>
+                            <a href="/Contact/AllContactsForPartner?partnerId=${data}" class="btn btn-info">Contacts</a>
+                        `;
+                    }
+                },
+                {
+                    data: 'id',
+                    render: function (data) {
+                        return `
+                            <a href="/BusinessPartner/Edit/${data}" class="btn btn-warning">Edit</a>
+                            <form asp-action="Delete" asp-route-id="${data}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this partner?');">Delete</button>
+                            </form>
+                        `;
+                    }
+                }
+            ]
+        });
+    </script>
+}
