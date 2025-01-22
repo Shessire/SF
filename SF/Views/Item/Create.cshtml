@@ -1,0 +1,56 @@
+﻿@model Item
+
+<div class="container">
+    <h1>Create Item</h1>
+    <form asp-action="Create">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="GPSC"></label>
+            <input asp-for="GPSC" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BaseUOMId"></label>
+            <select asp-for="BaseUOMId" class="form-control">
+                <option value="" disabled selected>--- Select UOM ---</option>
+                @foreach (var uom in ViewBag.BaseUOMs)
+                {
+                    <option value="@uom">@uom</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Type"></label>
+            <select asp-for="Type" class="form-control">
+                <option value="" disabled selected>--- Select Type ---</option>
+                @foreach (var type in ViewBag.Types)
+                {
+                    <option value="@type">@type</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Category"></label>
+            <select asp-for="Category" class="form-control">
+                <option value="" disabled selected>--- Select Category ---</option>
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <option value="@category">@category</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="Price"></label>
+            <input asp-for="Price" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Cost"></label>
+            <input asp-for="Cost" class="form-control" />
+        </div>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+</div>

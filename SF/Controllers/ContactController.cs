@@ -218,6 +218,25 @@ namespace SF.Controllers
             return Json(new { data = contacts });
         }
 
+        public async Task<IActionResult> GetContactsForPartner(int partnerId)
+        {
+            var contacts = await _context.Contacts
+                .Include(c => c.Address) // Include related Address
+                .Where(c => c.Address.BusinessPartnerId == partnerId) // Filter by partnerId
+                .Select(c => new
+                {
+                    c.Title,
+                    c.Name,
+                    c.Tel,
+                    c.Mobile,
+                    c.Email,
+                    AddressName = c.Address.Name, // Include the Address name
+                    c.Id
+                }).ToListAsync();
+
+            return Json(new { data = contacts });
+        }
+
 
     }
 }

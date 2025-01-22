@@ -4,7 +4,7 @@
     <h1>Contacts for @ViewData["PartnerName"]</h1>
 </div>
 
-<table class="table table-bordered">
+<table id="contactsTable" class="table table-bordered">
     <thead>
         <tr>
             <th>Name</th>
@@ -15,16 +15,27 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var contact in Model)
-        {
-            <tr>
-                <td>@contact.Title @contact.Name</td>
-                <td>@contact.Tel</td>
-                <td>@contact.Mobile</td>
-                <td>@contact.Email</td>
-                <td>@contact.Address.Name</td>
-            </tr>
-        }
     </tbody>
 </table>
 <a asp-controller="BusinessPartner" asp-action="Index" class="btn btn-secondary">Back to Business Partners</a>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#contactsTable').DataTable({
+                ajax: {
+                    url: '/Contact/GetContactsForPartner',
+                    type: 'GET',
+                    data: { partnerId: @ViewData["PartnerId"] }
+                },
+                columns: [
+                    { data: 'title', render: function (data, type, row) { return row.title + ' ' + row.name; } },
+                    { data: 'tel' },
+                    { data: 'mobile' },
+                    { data: 'email' },
+                    { data: 'addressName' }
+                ]
+            });
+        });
+    </script>
+}

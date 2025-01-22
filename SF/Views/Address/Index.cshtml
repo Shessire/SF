@@ -20,24 +20,6 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var address in Model)
-        {
-            <tr>
-                <td>@address.Name</td>
-                <td>@address.AddressPri</td>
-                <td>@address.AddressOpt</td>
-                <td>@address.PostalCode</td>
-                <td>
-                    <a asp-controller="Contact" asp-action="Index" asp-route-addressId="@address.Id" class="btn btn-info">Contacts</a>
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@address.Id" class="btn btn-warning">Edit</a>
-                    <button type="button" class="btn btn-danger delete-button" data-toggle="modal" data-target="#deleteModal" data-id="@address.Id" data-name="@address.Name">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-        }
     </tbody>
 </table>
 

@@ -18,6 +18,7 @@ namespace SF.Data
         public DbSet<BusinessPartner> BusinessPartners { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Contact> Contacts { get; set; }
+        public DbSet<Item> Items { get; set; }
 
 
 
