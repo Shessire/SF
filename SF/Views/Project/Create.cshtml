@@ -1,0 +1,44 @@
+﻿@model Project
+
+<h2>Create Project</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="Name">Name</label>
+        <input type="text" name="Name" class="form-control"/>
+    </div>
+
+    <div class="form-group">
+        <label for="Type">Type</label>
+        <select name="Type" class="form-control">
+            <option value="" disabled selected>--- Select Type ---</option>
+            <option value="Project">Project</option>
+            <option value="Internal">Internal</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="Description">Description</label>
+        <textarea name="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="CustomerDocRef">Customer Doc Ref</label>
+        <input type="number" name="CustomerDocRef" class="form-control"/>
+    </div>
+
+    <div class="row">
+        <div class="form-group col-6">
+            <label for="StartDate">Start Date</label>
+            <input type="date" name="StartDate" class="form-control"/>
+        </div>
+
+        <div class="form-group col-6">
+            <label for="EndDate">End Date</label>
+            <input type="date" name="EndDate" class="form-control"/>
+        </div>
+    </div>
+
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

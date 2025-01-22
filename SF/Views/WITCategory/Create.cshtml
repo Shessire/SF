@@ -1,0 +1,29 @@
+﻿@model WITCategory
+
+<div class="container">
+    <h1>Create</h1>
+    <form asp-action="Create">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Code"></label>
+            <input asp-for="Code" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label asp-for="Detail"></label>
+            <input asp-for="Detail" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label asp-for="GroupCode"></label>
+            <input asp-for="GroupCode" class="form-control" />
+        </div>
+
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+</div>
+

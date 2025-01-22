@@ -19,8 +19,8 @@ namespace SF.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<Item> Items { get; set; }
-
-
+        public DbSet<Project> Projects { get; set; }
+        public DbSet<WITCategory> WITCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
