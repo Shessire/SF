@@ -5,10 +5,9 @@
     <a asp-action="Create" class="btn btn-primary">Add New Partner</a>
 </div>
 
-<table id="businessPartnerTable" class="table">
+<table id="businessPartnerTable" class="table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
             <th>Name</th>
             <th>Category</th>
             <th>Entity Type</th>
@@ -30,7 +29,6 @@
                 dataSrc: 'data'
             },
             columns: [
-                { data: 'id' },
                 { data: 'name' },
                 { data: 'category' },
                 { data: 'entityType' },

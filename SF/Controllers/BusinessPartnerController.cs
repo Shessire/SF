@@ -85,7 +85,6 @@ namespace SF.Controllers
             var partners = await _context.BusinessPartners
                 .Select(bp => new
                 {
-                    bp.Id,
                     bp.Name,
                     bp.Category,
                     bp.EntityType
