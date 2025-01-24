@@ -1,0 +1,15 @@
+﻿@model WITPercent
+
+<div class="container">
+    <h1>Create</h1>
+    <form asp-action="Create">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Value"></label>
+            <input asp-for="Value" class="form-control"/>
+        </div>
+
+        <a class="btn btn-secondary" asp-action="Index">Cancel</a>
+        <button class="btn btn-primary">Create</button>
+    </form>
+</div>

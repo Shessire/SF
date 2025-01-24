@@ -114,6 +114,21 @@ namespace SF.Controllers
             return RedirectToAction(nameof(Index), new { partnerId });
         }
 
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var address = await _context.Addresses.FindAsync(id);
+            if (address != null)
+            {
+                _context.Addresses.Remove(address);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
         public async Task<IActionResult> GetData(int partnerId)
         {
             var addresses = await _context.Addresses

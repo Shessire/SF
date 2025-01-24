@@ -25,53 +25,8 @@
 
 <a asp-action="Index" asp-controller="BusinessPartner" class="btn btn-secondary">Back to Business Partners</a>
 
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete <strong id="addressName"></strong>?
-            </div>
-            <div class="modal-footer">
-                <form id="deleteForm" method="post">
-                    @Html.AntiForgeryToken()
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteModal = document.getElementById('deleteModal');
-            const addressNameSpan = document.getElementById('addressName');
-            const deleteForm = document.getElementById('deleteForm');
-
-            document.querySelectorAll('.delete-button').forEach(button => {
-                button.addEventListener('click', function () {
-                    const addressId = this.getAttribute('data-id');
-                    const addressName = this.getAttribute('data-name');
-
-                    // Update modal content
-                    addressNameSpan.textContent = addressName;
-
-                    // Update the form action
-                    deleteForm.action = `/Address/Delete/${addressId}`;
-                });
-            });
-        });
-
-
-
-
         $('#addressTable').DataTable({
             ajax: {
                 url: '/Address/GetData',
@@ -96,9 +51,9 @@
                     render: function (data) {
                         return `
                                     <a href="/Address/Edit/${data}" class="btn btn-warning">Edit</a>
-                                    <button type="button" class="btn btn-danger delete-button" data-toggle="modal" data-target="#deleteModal" data-id="${data}" data-name="Address ${data}">
-                                        Delete
-                                    </button>
+                                    <form asp-action="DeleteConfirmed" asp-route-id="${data}" method="post" class="d-inline">
+                                        <a href="/Address/Delete/${data}" class="btn btn-danger">Delete</a>
+                                    </form>
                                 `;
                     }
                 }
