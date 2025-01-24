@@ -385,6 +385,26 @@ namespace SF.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetData()
+        {
+            var users = await _userManager.Users
+                .Include(u => u.Company)
+                .Select(user => new
+                {
+                    user.Id,
+                    FullName = user.FirstName + " " + user.LastName,
+                    user.Email,
+                    Company = user.CompanyId == null ? "Not Assigned" : user.Company.Name,
+                    user.TelephoneNumber,
+                    user.FaxNumber,
+                    Roles = string.Join(", ", _userManager.GetRolesAsync(user).Result)
+                })
+                .ToListAsync();
+
+            return Json(new { data = users });
+        }
+
 
     }
 }
