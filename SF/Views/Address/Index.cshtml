@@ -51,9 +51,7 @@
                     render: function (data) {
                         return `
                                     <a href="/Address/Edit/${data}" class="btn btn-warning">Edit</a>
-                                    <form asp-action="DeleteConfirmed" asp-route-id="${data}" method="post" class="d-inline">
-                                        <a href="/Address/Delete/${data}" class="btn btn-danger">Delete</a>
-                                    </form>
+                                    <a href="/Address/Delete/${data}" class="btn btn-danger">Delete</a>
                                 `;
                     }
                 }

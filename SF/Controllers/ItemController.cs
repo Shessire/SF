@@ -79,8 +79,6 @@ namespace SF.Controllers
             return View(item);
         }
 
-        // POST: Delete
-        [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _context.Items.FindAsync(id);
@@ -89,8 +87,21 @@ namespace SF.Controllers
                 return NotFound();
             }
 
+            return View(item);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var item = await _context.Items.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
             _context.Items.Remove(item);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
 

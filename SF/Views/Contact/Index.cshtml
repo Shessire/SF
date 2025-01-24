@@ -23,20 +23,6 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var contact in Model.Contacts)
-        {
-            <tr>
-                <td>@contact.Title</td>
-                <td>@contact.Name</td>
-                <td>@contact.Tel</td>
-                <td>@contact.Mobile</td>
-                <td>@contact.Email</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@contact.Id" class="btn btn-md btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@contact.Id" class="btn btn-md btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
     </tbody>
 </table>
 

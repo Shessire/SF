@@ -96,9 +96,22 @@ namespace SF.Controllers
         }
 
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // GET: Delete confirmation view
         public async Task<IActionResult> Delete(int id)
+        {
+            var address = await _context.Addresses.FindAsync(id);
+            if (address == null)
+            {
+                return NotFound();
+            }
+
+            return View(address); // Returns a view to confirm deletion
+        }
+
+        // POST: Handles the actual deletion
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var address = await _context.Addresses.FindAsync(id);
             if (address == null)
@@ -114,18 +127,6 @@ namespace SF.Controllers
             return RedirectToAction(nameof(Index), new { partnerId });
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var address = await _context.Addresses.FindAsync(id);
-            if (address != null)
-            {
-                _context.Addresses.Remove(address);
-                await _context.SaveChangesAsync();
-            }
-            return RedirectToAction(nameof(Index));
-        }
 
 
 
