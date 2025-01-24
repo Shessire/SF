@@ -21,6 +21,7 @@ namespace SF.Data
         public DbSet<Item> Items { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<WITCategory> WITCategories { get; set; }
+        public DbSet<WITPercent> WITPercents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

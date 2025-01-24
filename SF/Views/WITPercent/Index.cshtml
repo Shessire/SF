@@ -1,0 +1,42 @@
+﻿<div class="d-flex justify-content-between align-items-center my-3">
+    <h1>WIT Percentage</h1>
+    <a class="btn btn-primary" asp-action="Create">Add New</a>
+</div>
+
+<table id="witTable" class="table table-striped">
+    <thead>
+        <tr>
+            <th>WIT Percentage Value</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            $('#witTable').DataTable({
+                ajax: {
+                    url: "/WITPercent/GetData",
+                    type: "Get"
+                },
+                columns: [
+                    { data : "value"},
+                    {
+                        data: "id",
+                        render: function (data) {
+                            return `
+                                    <a href="/WITPercent/Edit/${data}" class="btn btn-warning">Edit</a>
+                                    <form asp-action="Delete" asp-route-id="${data}" method = "post" class= "d-inline" >
+                                        <button type="submit" class= "btn btn-danger" onclick = "return confirm('Are you sure you want to delete this item?');" >Delete</button>
+                                    </form>
+                            `;
+                        }
+                    }
+                ]
+            })
+        })
+    </script>
+}
